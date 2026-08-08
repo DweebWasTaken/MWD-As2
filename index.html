@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Viewport: fit the page to the device width and disable pinch-zoom
+         so the site behaves like a native mobile app. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Food Items</title>
+
+    <!-- PWA manifest: the config file that makes the app installable. -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#c0c0c0">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+
+    <link href="index.css" rel="stylesheet" type="text/css">
+
+    <!-- ===== Service Worker registration =====
+         Checks the browser supports service workers, registers sw.js,
+         and logs success (.then) or failure (.catch). -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function (reg) {
+                        console.log('Service Worker registered. Scope:', reg.scope);
+                    })
+                    .catch(function (err) {
+                        console.error('Service Worker registration failed:', err);
+                    });
+            });
+        } else {
+            console.log('Service Workers are not supported in this browser.');
+        }
+    </script>
+</head>
+<body>
+
+    <!-- =========================================================
+         SCREEN 1: LISTING
+         Shows the list of products fetched from the web service.
+         Only one ".page" div is visible at a time (see displayPage()).
+         ========================================================= -->
+    <div id="page_home" class="page" style="display:block;">
+        <div class="div_header">
+            <span id="span_header">Listings</span>
+            <!-- Shows the server's "last_update" timestamp -->
+            <span id="span_header_date">Loading…</span>
+        </div>
+        <div id="div_products_list">
+            <!-- Product items are injected here by renderListing() in app.js -->
+            <ul id="ul_products_list"></ul>
+            <!-- Loading / error message while data is fetched -->
+            <div id="listing_status" class="status_msg">Fetching latest items…</div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         SCREEN 2: DETAILS
+         Shows one product's details; filled by showDetails() in app.js.
+         The back arrow returns to the listing.
+         ========================================================= -->
+    <div id="page_details" class="page" style="display:none;">
+        <div class="div_header">
+            <span id="span_header">
+                <img id="btn_product_details_back" src="img/back_white.png" onclick="displayPage('page_home')">
+                <span id="details_title">Details</span>
+            </span>
+        </div>
+        <div id="div_product_details">
+            <div id="div_product_details_img">
+                <img id="details_image" src="" alt="">
+            </div>
+            <!-- The four detail cells are filled from the product data -->
+            <div id="div_product_details_data">
+                <div class="div_product_details_data_cell">
+                    <span class="product_details_data_name">Promo Duration</span><br><span id="details_promo">-</span>
+                </div>
+                <div class="div_product_details_data_cell">
+                    <span class="product_details_data_name">Product Type</span><br><span id="details_type">-</span>
+                </div>
+                <div class="div_product_details_data_cell">
+                    <span class="product_details_data_name">Gluten</span><br><span id="details_gluten">-</span>
+                </div>
+                <div class="div_product_details_data_cell">
+                    <span class="product_details_data_name">Price</span><br><span id="details_price">-</span>
+                </div>
+            </div>
+            <!-- Opens the map screen ("Where to Find") -->
+            <div id="div_product_details_footer" onclick="showMap()">
+                WHERE TO FIND &gt;
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         SCREEN 3: MAP ("Where to Find")
+         Google Map with user-saved pins (localStorage) plus the
+         Google Places "Find nearby" advanced features.
+         ========================================================= -->
+    <div id="page_map" class="page" style="display:none;">
+        <div class="div_header">
+            <span id="span_header">
+                <img id="btn_map_back" src="img/back_white.png" onclick="displayPage('page_details')">
+                <span id="map_title">Where</span>
+            </span>
+        </div>
+        <!-- The Google Map is rendered into this div by app.js -->
+        <div id="div_product_map"></div>
+        <!-- Status banner: "Searching…", "Found 12 stalls", etc. -->
+        <div id="map_banner"></div>
+        <!-- Map controls -->
+        <div id="div_map_footer">
+            <span id="saved_count">0 saved</span> ·                       <!-- live count of saved pins -->
+            <span id="btn_add_pin">Add pin</span> ·                        <!-- arm one tap-to-save pin -->
+            <label class="chk_label"><input type="checkbox" id="chk_open_now"> Open now</label> · <!-- filter closed stalls -->
+            <span id="btn_my_location">My location</span> ·               <!-- center on user (Geolocation) -->
+            <span id="btn_find_nearby">Find nearby</span> ·               <!-- Google Places search -->
+            <span id="btn_recenter">Reset view</span> ·                   <!-- back to Singapore overview -->
+            <span id="btn_clear_markers">Clear</span>                      <!-- delete all saved pins -->
+        </div>
+    </div>
+
+    <!-- Main application logic -->
+    <script src="app.js"></script>
+</body>
+</html>

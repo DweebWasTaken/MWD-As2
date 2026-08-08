@@ -1,0 +1,125 @@
+/* ==========================================================================
+   Food Items PWA - stylesheet
+   Layout is mobile-app style: a fixed top header, scrolling content in the
+   middle, and (on some screens) a fixed bottom bar.
+   ========================================================================== */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+}
+
+/* ---------- Shared top header bar (used on all three screens) ---------- */
+.div_header {
+    position: fixed;        /* stays pinned to the top while content scrolls */
+    top: 0px;
+    left: 0px;
+    height: 48px;
+    width: 100%;
+    background-color: silver;
+    line-height: 48px;      /* vertically centres the text in the 48px bar */
+    padding: 0 16px;
+    box-sizing: border-box;
+    z-index: 1000;          /* keeps the header above page content */
+}
+
+.div_header img {           /* the back-arrow button */
+    position: relative;
+    top: 6px;
+    height: 24px;
+    width: 24px;
+    margin-right: 4px;
+    cursor: pointer;
+}
+
+#span_header {
+    color: white;
+    float: left;
+}
+
+#span_header_date {         /* the "last_update" timestamp, right-aligned */
+    color: grey;
+    font-weight: 600;
+    font-size: 14px;
+    float: right;
+    position: relative;
+}
+
+/* ---------- Listing screen ---------- */
+#div_products_list { margin: 48px 0 0 0; padding: 0; }   /* 48px clears the fixed header */
+#ul_products_list { list-style-type: none; padding: 0; margin: 0; }
+#ul_products_list li { height: 60px; border: lightgrey solid 1px; cursor: pointer; } /* each product row */
+#ul_products_list li:active { background-color: #f2f2f2; }   /* tap feedback */
+.li_product_image { padding: 6px; }
+.li_product_image img { height: 48px; width: 48px; float: left; object-fit: cover; }
+.li_product_name { position: relative; left: 10px; top: 8px; font-weight: 600; }
+.li_product_price { font-weight: 400; color: #333; font-size: 14px; }
+.status_msg { padding: 24px 16px; color: grey; font-size: 14px; text-align: center; } /* loading/error text */
+
+/* ---------- Details screen ---------- */
+#div_product_details { margin-top: 48px; margin-bottom: 48px; }  /* clear fixed header + footer */
+#div_product_details_img { margin: 0; padding: 16px; }
+#div_product_details_img img {
+    width: 100%; max-height: 300px; height: 50%;
+    border: 1px solid lightgrey; object-fit: cover; box-sizing: border-box;
+}
+#div_product_details_data { padding: 0 16px; }
+.div_product_details_data_cell {                 /* the four info cells, side by side */
+    display: inline-block; width: 24%; font-weight: 600; vertical-align: top;
+}
+.product_details_data_name { font-size: 14px; color: grey; }   /* the small grey label */
+#div_product_details_footer {                    /* the "WHERE TO FIND" bar */
+    position: fixed; bottom: 0px; left: 0px; height: 48px; width: 100%;
+    background-color: rgb(93, 93, 93); line-height: 48px; padding: 0 16px;
+    box-sizing: border-box; color: white; text-align: center;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+}
+
+/* ---------- Map screen ---------- */
+#div_product_map {                               /* the Google Map fills the area between bars */
+    width: 100%;
+    position: fixed;
+    top: 48px;                                   /* below the header */
+    bottom: 48px;                                /* above the footer */
+    left: 0;
+    height: calc(100vh - 96px);                  /* explicit height so the map renders */
+}
+#div_map_footer {                                /* the row of map controls */
+    position: fixed; bottom: 0; left: 0; height: 48px; width: 100%;
+    background-color: rgb(93, 93, 93); line-height: 48px; padding: 0 16px;
+    box-sizing: border-box; color: white; text-align: center;
+    font-size: 13px; z-index: 1000;
+}
+/* the clickable text "buttons" in the map footer */
+#btn_clear_markers, #btn_find_nearby, #btn_my_location, #btn_recenter, #btn_add_pin { text-decoration: underline; cursor: pointer; font-weight: 600; }
+
+#map_banner {                                    /* floating status pill: "Found 12 stalls" */
+    display: none;                               /* shown by JS only when there's a message */
+    position: fixed;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);                 /* horizontally centred */
+    background: rgba(34, 40, 49, 0.9);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 1200;
+    white-space: nowrap;
+}
+
+.chk_label { cursor: pointer; }                  /* the "Open now" checkbox label */
+#saved_count { font-weight: 600; }               /* the "N saved" counter */
+
+/* ---------- Install / notify buttons (top-right, added by app.js) ---------- */
+#pwa_actions { position: fixed; top: 8px; right: 12px; z-index: 1100; }
+.pwa_btn {
+    background: #fff; color: #333; border: none; border-radius: 4px;
+    padding: 4px 8px; font-size: 12px; font-weight: 600; margin-left: 6px; cursor: pointer;
+}
+.synced_tag {                                    /* the "Synced HH:MM:SS" tag that flashes on refresh */
+    color: #fff; font-size: 11px; font-weight: 600;
+    background: rgba(0,0,0,0.35); padding: 3px 7px; border-radius: 4px;
+    margin-right: 4px; opacity: 0.55; transition: opacity 0.3s;
+}
