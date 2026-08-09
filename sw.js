@@ -6,7 +6,7 @@
    ========================================================= */
 
 // Cache version constant -> bump this string whenever the app shell changes.
-const CACHE_NAME = "static-shell-cache-v14";
+const CACHE_NAME = "static-shell-cache-v16";
 
 // Only the STATIC app-shell files are cached (not the dynamic food data).
 const APP_SHELL = [
@@ -57,7 +57,9 @@ self.addEventListener("fetch", event => {
     // so app.js can handle the network call + CORS fallback itself.
     if (url.includes("retrieve_records") ||
         url.includes("allorigins") ||
-        url.includes("corsproxy")) {
+        url.includes("corsproxy") ||
+        url.includes(".netlify/functions") ||
+        url.includes("mwdpushserver")) {
         return;
     }
 
