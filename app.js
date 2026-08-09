@@ -583,11 +583,12 @@ async function enablePush() {
         console.log("Push subscription:", JSON.stringify(sub));
 
         // Register this device with the push server so it can send us pushes.
+        // Body sent as text/plain so the browser skips the CORS preflight.
         if (PUSH_SERVER_URL) {
             try {
                 await fetch(PUSH_SERVER_URL + "/.netlify/functions/push", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify({ action: "subscribe", subscription: sub })
                 });
                 console.log("Subscription sent to push server.");
