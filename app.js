@@ -585,10 +585,10 @@ async function enablePush() {
         // Register this device with the push server so it can send us pushes.
         if (PUSH_SERVER_URL) {
             try {
-                await fetch(PUSH_SERVER_URL + "/.netlify/functions/subscribe", {
+                await fetch(PUSH_SERVER_URL + "/.netlify/functions/push", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(sub)
+                    body: JSON.stringify({ action: "subscribe", subscription: sub })
                 });
                 console.log("Subscription sent to push server.");
             } catch (e) {
