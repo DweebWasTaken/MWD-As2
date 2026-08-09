@@ -6,7 +6,7 @@
    ========================================================= */
 
 // Cache version constant -> bump this string whenever the app shell changes.
-const CACHE_NAME = "static-shell-cache-v20";
+const CACHE_NAME = "static-shell-cache-v21";
 
 // Only the STATIC app-shell files are cached (not the dynamic food data).
 const APP_SHELL = [

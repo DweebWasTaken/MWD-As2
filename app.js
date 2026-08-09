@@ -42,7 +42,7 @@ let googleReady = null;         // promise that resolves when the API is loaded
 let userLocation = null;        // {lat,lng} from "My location"
 let userLocMarker = null;       // the "you are here" marker
 let placeClusterer = null;      // marker clusterer for place pins
-let foundPlaces = [];           // [{place, marker, openNow}] from last search
+let foundPlaces = [];           // [{place, marker}] from last search
 let addPinMode = false;         // when true, the next map tap drops a saved pin
 
 
@@ -313,7 +313,7 @@ async function findNearby() {
             textQuery: currentProduct.name,                 // e.g. "Nasi Lemak"
             fields: ["displayName", "location", "formattedAddress",
                      "rating", "userRatingCount", "photos",
-                     "regularOpeningHours", "utcOffsetMinutes"],
+                     "regularOpeningHours"],
             region: "sg",
             language: "en",
             maxResultCount: 15
@@ -328,26 +328,18 @@ async function findNearby() {
             return;
         }
 
-        // Build a record per place, including whether it's open now (for filtering).
+        // Build a marker per place.
         for (const place of places) {
-            let openNow = null;
-            try {
-                const o = await place.isOpen();
-                openNow = (o === true) ? true : (o === false) ? false : null;
-            } catch (e) { /* hours unknown */ }
-
             const marker = new google.maps.Marker({
                 position: place.location,
                 title: place.displayName,
                 icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
             });
             marker.addListener("click", () => {
-                const openText = openNow === true ? "🟢 Open now"
-                               : openNow === false ? "🔴 Closed" : "";
-                infoWindow.setContent(buildPlaceInfo(place, openText));
+                infoWindow.setContent(buildPlaceInfo(place));
                 infoWindow.open(map, marker);
             });
-            foundPlaces.push({ place: place, marker: marker, openNow: openNow });
+            foundPlaces.push({ place: place, marker: marker });
         }
 
         renderFoundPlaces();
@@ -357,18 +349,13 @@ async function findNearby() {
     }
 }
 
-/* Draw the found stalls, applying the "Open now" filter, clustering,
-   fitting bounds, and updating the result-count banner. */
+/* Draw the found stalls, clustering, fitting bounds, and updating the banner. */
 function renderFoundPlaces() {
-    const openOnly = document.getElementById("chk_open_now") &&
-                     document.getElementById("chk_open_now").checked;
-
     if (placeClusterer) { placeClusterer.clearMarkers(); placeClusterer = null; }
     placeMarkers.forEach(m => m.setMap(null));
     placeMarkers = [];
 
-    const visible = foundPlaces.filter(fp => !openOnly || fp.openNow === true);
-    visible.forEach(fp => placeMarkers.push(fp.marker));
+    foundPlaces.forEach(fp => placeMarkers.push(fp.marker));
 
     if (window.markerClusterer && markerClusterer.MarkerClusterer) {
         placeClusterer = new markerClusterer.MarkerClusterer({ map: map, markers: placeMarkers });
@@ -377,15 +364,11 @@ function renderFoundPlaces() {
     }
 
     const bounds = new google.maps.LatLngBounds();
-    visible.forEach(fp => bounds.extend(fp.place.location));
+    foundPlaces.forEach(fp => bounds.extend(fp.place.location));
     if (userLocation) bounds.extend(userLocation);
-    if (visible.length) map.fitBounds(bounds);
+    if (foundPlaces.length) map.fitBounds(bounds);
 
-    if (openOnly) {
-        setBanner("Showing " + visible.length + " of " + foundPlaces.length + " (open now)");
-    } else {
-        setBanner("Found " + foundPlaces.length + " stall" + (foundPlaces.length === 1 ? "" : "s"));
-    }
+    setBanner("Found " + foundPlaces.length + " stall" + (foundPlaces.length === 1 ? "" : "s"));
 }
 
 /* Small status banner near the top of the map. */
@@ -428,7 +411,7 @@ function setAddPinMode(on) {
 function toggleAddPin() { setAddPinMode(!addPinMode); }
 
 /* Build the info-window HTML: name, rating, open state, distance, photo, directions. */
-function buildPlaceInfo(place, openText) {
+function buildPlaceInfo(place) {
     const name = place.displayName || "Stall";
     const addr = place.formattedAddress || "";
 
@@ -438,7 +421,7 @@ function buildPlaceInfo(place, openText) {
         rating = "⭐ " + place.rating.toFixed(1) +
                  (place.userRatingCount ? " (" + place.userRatingCount + ")" : "");
     }
-    const ratingLine = [rating, openText].filter(Boolean).join(" · ");
+    const ratingLine = rating;
 
     // Today's opening / closing time (from regularOpeningHours)
     let hoursLine = "";
@@ -626,9 +609,6 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn_my_location").onclick = myLocation;
     document.getElementById("btn_recenter").onclick = recenterMap;
     document.getElementById("btn_add_pin").onclick = toggleAddPin;
-    document.getElementById("chk_open_now").onchange = () => {
-        if (foundPlaces.length) renderFoundPlaces();
-    };
 
     loadProducts();
     // Live update: re-fetch periodically so UI reflects service changes.

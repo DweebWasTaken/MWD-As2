@@ -109,7 +109,6 @@ body {
     white-space: nowrap;
 }
 
-.chk_label { cursor: pointer; }                  /* the "Open now" checkbox label */
 #saved_count { font-weight: 600; }               /* the "N saved" counter */
 
 /* ---------- Install / notify buttons (top-right, added by app.js) ---------- */
@@ -149,7 +148,6 @@ body {
         padding: 12px 4px;
         touch-action: manipulation;
     }
-    #chk_open_now { transform: scale(1.3); margin: 0 4px; }
 
     /* Top-right action buttons: slightly smaller, wrap if needed */
     #pwa_actions {
