@@ -9,7 +9,7 @@ const VAPID_PUBLIC_KEY = "BOz1H6xlMNKinnHdMpacu7f5Oso5PKEhhLkCQXGaRJUBJJ4hB4okzr
 
 // Your deployed push server. For Netlify, this is your site's base URL, e.g.
 // "https://your-site.netlify.app". Leave "" to skip server registration.
-const PUSH_SERVER_URL = "";  // <-- paste your Netlify site URL here after deploying
+const PUSH_SERVER_URL = "https://mwdpushserver.netlify.app/";  // <-- paste your Netlify site URL here after deploying
 
 // INEC endpoint sends no CORS headers. Order of attempts:
 // The INEC endpoint sends no CORS header, so the browser can't read it
