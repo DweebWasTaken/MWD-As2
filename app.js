@@ -4,8 +4,12 @@
 
 const DATA_URL = "https://inec.sg/assignment/retrieve_records";
 
-// Valid P-256 VAPID public key so pushManager.subscribe() actually succeeds.
-const VAPID_PUBLIC_KEY = "BPFqSxm-hluYWgyk-CjankX1t2SH_2qchitHVY41njfZ52Sc56EHfvYnQNsMik5L6VjSb5KiIab2OMgwfyV_TKI";
+// PUBLIC VAPID key - MUST match the one in your push server (push-server.js).
+const VAPID_PUBLIC_KEY = "BOz1H6xlMNKinnHdMpacu7f5Oso5PKEhhLkCQXGaRJUBJJ4hB4okzrK6PQQmjwv6UB7_vjmqz-C6yWqd9UQ7-Mk";
+
+// Your deployed push server. For Netlify, this is your site's base URL, e.g.
+// "https://your-site.netlify.app". Leave "" to skip server registration.
+const PUSH_SERVER_URL = "";  // <-- paste your Netlify site URL here after deploying
 
 // INEC endpoint sends no CORS headers. Order of attempts:
 // The INEC endpoint sends no CORS header, so the browser can't read it
@@ -577,6 +581,21 @@ async function enablePush() {
             });
         }
         console.log("Push subscription:", JSON.stringify(sub));
+
+        // Register this device with the push server so it can send us pushes.
+        if (PUSH_SERVER_URL) {
+            try {
+                await fetch(PUSH_SERVER_URL + "/.netlify/functions/subscribe", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(sub)
+                });
+                console.log("Subscription sent to push server.");
+            } catch (e) {
+                console.warn("Could not reach push server:", e.message);
+            }
+        }
+
         // Confirm to the user that the receive path is live.
         reg.showNotification("Push enabled", {
             body: "You're subscribed. Incoming pushes will appear here.",
